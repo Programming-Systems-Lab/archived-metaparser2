@@ -1,0 +1,70 @@
+Programming Systems Lab
+XML TagProcessor v0.1 README
+Copyright (c) 2001 The Trustees of Columbia University in the City of
+New York.  All Rights Reserved.
+----------------------------------------
+
+* Introduction
+
+XML TagProcessor can process incoming XML streams by applying certain 
+rules against the document.  Then the result is represented as attribute-
+value pairs and stored in a hashtable passed by the XML Metaparser.
+
+* Description
+
+TagProcessor.class	-- the TagProcessor interface
+	                   (to be included in every class that uses TagProcessor)
+TagProcessorImpl.class	-- an implementation class of TagProcessor
+RuleResult.class    	-- process the "result.xml" and store it as a Doc tree.
+JarResources.class	-- retrieve the files from a jar file
+result.xml		-- an XML file that stores the rules
+rule.xsl		-- an XSL template to be used by XSLT engine
+tagprocessor.jar	-- a jar file that contains all files described above
+			   (to be sent as a module by Oracle upon request)
+
+TransformTest.class 	-- My own test program
+
+After the processing, the String/siena.AttributeValue will be put in the hashtable
+
+* Distribution/Prerequisites
+
+* Configuration
+
+XML documents with different schemas should have their respective rule.xsl and result.xml
+See the sample rule.xsl and result.xml for the format.
+
+In result.xml, multiple "effect" can be added under "effects" tag to achieve multiple
+attribute-value pairs per expression match.
+
+In rule.xsl, insert "<xpath name=EFFECTS_NAME value=XPATH>", which will be added
+under "effects" tag whose name matches EFFECTS_NAME.  This is used to insert original
+xml-referring xpath.
+
+* Execution
+
+a sample fragment of code (from TransformTest.java) :
+
+ 	URL aurl[] = { new URL(theURL) };
+        URLClassLoader urlclassloader = new URLClassLoader(aurl);
+        Class class1 = Class.forName("psl.tagprocessor.TagProcessorImpl", true, urlclassloader);
+        Hashtable hashtable = new Hashtable();
+        XMLReader xmlreader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
+        TagProcessor tagprocessor = (TagProcessor)class1.newInstance();
+        tagprocessor.setResource(aurl[0].getPath());
+        tagprocessor.init(hashtable);
+        xmlreader.setContentHandler(tagprocessor.getContentHandler());
+        xmlreader.parse(s);
+        tagprocessor.process();
+
+
+* Documentation
+
+For more information, see the TagProcessor proposal KX/Project Proposals on BSCW on canal.
+
+* Known Problems/Bugs
+
+No known bugs at present.
+
+* Contact
+
+Email sw375@cs.columbia.edu if you have any questions.

@@ -1,0 +1,70 @@
+<ruleset>
+  <result>
+    <effects name="numOfMessage">
+      <effect>
+        <key>numMessage</key>
+        <type>int</type>
+        <value>$numMessage+1</value>
+      </effect>
+    </effects>
+    <expression>
+      <or>
+        <id>1234</id>
+      </or>
+    </expression>
+  </result>
+  <result>
+    <effects name="return_receipt">
+      <effect>
+        <key>return_receipt_needed</key>
+        <type>boolean</type>
+        <value>true</value>
+      </effect>
+    </effects>
+    <expression>
+      <or>
+        <id>1002</id>
+        <and> 
+	  <id>1000</id>
+          <id>1001</id>
+        </and>
+      </or>
+    </expression>
+  </result>
+  <result>
+    <effects name="psl">
+      <effect>
+        <key>psl_related</key>
+        <type>boolean</type>
+        <value>true</value>
+      </effect>
+    </effects>
+    <expression>
+      <or>
+        <id>psl</id>
+        <id>ids</id>
+      </or>
+    </expression>
+  </result>
+  <result>
+    <effects name="temperature">
+      <effect>
+        <key>temperature_alert</key>
+        <type>String</type>
+        <value>"The temperature is abnormal!"</value>
+      </effect>
+      <effect>
+        <key>important</key>
+        <type>boolean</type>
+        <value>true</value>
+      </effect>
+    </effects>
+    <expression>
+      <or>
+	<id>2000</id>
+	<id>2001</id>
+      </or>
+    </expression>
+  </result>
+</ruleset>
+

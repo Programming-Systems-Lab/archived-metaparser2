@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+	
+<smartevent>
+  <metadata>
+    <tag>12345</tag>
+    <source>
+      <ipAddr>123.45.67.89</ipAddr>
+      <ipPort>12345</ipPort>
+    </source>
+    <time>2001-01-20T21:45:00</time>
+    <siena attribute="reading" type="double"
+    	value="/smartevent/temp/reading" />
+    <siena attribute="probeName" type="string"
+    	value="/smartevent/temp/probeName" />
+  </metadata>
+  <temp scale="F">
+    <!-- It's pretty cold out here :) -->
+    <reading>95.2273</reading>
+    <probeName>PSL Temp Probe</probeName>
+    <probeLoc>500 W 120th St., New York, NY 10027</probeLoc>
+  </temp>
+</smartevent>

@@ -1,0 +1,42 @@
+// ComMetaParserService20.idl : IDL source for ComMetaParserService20.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ComMetaParserService20.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+	[
+		object,
+		uuid(4540C43F-FE45-4658-99D5-AF0932F27E91),
+		dual,
+		helpstring("IMetaParser Interface"),
+		pointer_default(unique)
+	]
+	interface IMetaParser : IDispatch
+	{
+		[id(1), helpstring("method Init")] HRESULT Init();
+		[id(2), helpstring("method Parse")] HRESULT Parse([in] VARIANT xmlSource, [out, retval] VARIANT_BOOL *isSuccessful);
+		[id(3), helpstring("method Process")] HRESULT Process([out, retval] VARIANT_BOOL *isSuccessful);
+		[id(4), helpstring("method Output")] HRESULT Output([out, retval] BSTR *xmlOutput);
+	};
+
+[
+	uuid(2C05B437-6FFE-4986-ADFD-EB3532FB7698),
+	version(1.0),
+	helpstring("ComMetaParserService20 1.0 Type Library")
+]
+library COMMETAPARSERSERVICE20Lib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(27D06537-2839-405D-AB3C-62504D245959),
+		helpstring("MetaParser Class")
+	]
+	coclass MetaParser
+	{
+		[default] interface IMetaParser;
+	};
+};

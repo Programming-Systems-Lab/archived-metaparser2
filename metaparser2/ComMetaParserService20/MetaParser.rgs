@@ -1,0 +1,24 @@
+HKCR
+{
+	ComMetaParserService20.MetaParser.1 = s 'MetaParser Class'
+	{
+		CLSID = s '{27D06537-2839-405D-AB3C-62504D245959}'
+	}
+	ComMetaParserService20.MetaParser = s 'MetaParser Class'
+	{
+		CLSID = s '{27D06537-2839-405D-AB3C-62504D245959}'
+		CurVer = s 'ComMetaParserService20.MetaParser.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {27D06537-2839-405D-AB3C-62504D245959} = s 'MetaParser Class'
+		{
+			ProgID = s 'ComMetaParserService20.MetaParser.1'
+			VersionIndependentProgID = s 'ComMetaParserService20.MetaParser'
+			ForceRemove 'Programmable'
+			LocalServer32 = s '%MODULE%'
+			val AppID = s '{32870210-E255-4920-83B4-0B304EFA68BC}'
+			'TypeLib' = s '{2C05B437-6FFE-4986-ADFD-EB3532FB7698}'
+		}
+	}
+}

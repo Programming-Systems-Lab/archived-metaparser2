@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<ruleset namespace="xmlns:bo='http://www.book.org'">
+  <rule>
+    <condition>
+      <variable name="a" type="int" path="//bo:Date[1]"/>
+      <operator type="string" value="GT"/>
+      <variable name="b" type="int" value="1950"/>
+    </condition>
+    <action name="contemporary" type="bool" value="true"/>
+  </rule>
+</ruleset>

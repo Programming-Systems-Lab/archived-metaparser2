@@ -1,0 +1,2 @@
+rule_template=rule_template.xsl
+rule_set=rule_set.xml

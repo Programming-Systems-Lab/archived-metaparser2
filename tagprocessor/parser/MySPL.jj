@@ -1,0 +1,573 @@
+/* ----------------------------------------
+	JavaCC 1.1 Options
+-------------------------------------------*/
+
+options {
+	LOOKAHEAD = 1;				// (default 1)
+	CHOICE_AMBIGUITY_CHECK = 2;		// (default 2)
+	OTHER_AMBIGUITY_CHECK = 1;		// (default 1)
+
+	STATIC = false;				// (default true)
+	DEBUG_PARSER = false;			// (default false)
+	DEBUG_LOOKAHEAD = false;		// (default false)
+	DEBUG_TOKEN_MANAGER = false;		// (default false)
+	OPTIMIZE_TOKEN_MANAGER = false;		// (default true)
+	ERROR_REPORTING = true;			// (default true)
+	JAVA_UNICODE_ESCAPE = true;		// (default false)
+// @@@ Note: Unicode seems broken in JavaCC 1.1, else this should be true
+	UNICODE_INPUT = false;			// (default false)
+	IGNORE_CASE = false;			// (default false)
+	COMMON_TOKEN_ACTION = false;		// (default false)
+	USER_TOKEN_MANAGER = false;		// (default false)
+	USER_CHAR_STREAM = false;		// (default false)
+	BUILD_PARSER = true;			// (default true)
+	BUILD_TOKEN_MANAGER = true;		// (default true)
+	SANITY_CHECK = true;			// (default true)
+	FORCE_LA_CHECK = false;			// (default false)
+	CACHE_TOKENS = true;			// (default false)
+}
+
+/*--------------------------------------------
+	Parser Class
+---------------------------------------------*/
+
+PARSER_BEGIN(MyParser)
+
+package psl.tagprocessor.parser;
+
+import java.util.Hashtable;
+import siena.AttributeValue;
+import org.apache.regexp.RE;
+
+	public class MyParser {
+	    Hashtable table;
+
+	    public void setHashtable(Hashtable ht) {
+		table = ht;
+	    }
+
+            AttributeValue getVariableValue(String key) {
+		if(table.containsKey(key)) {
+	            return (AttributeValue) table.get(key);
+		}
+		return null;
+            }                      
+	
+	    void initialize(String type, String name) {
+	        if(type.equals("boolean")) {
+	            table.put(name, new AttributeValue(false));
+	        } else if(type.equals("int")) {
+	            table.put(name, new AttributeValue((int) 0));
+	        } else if(type.equals("double")) {
+	            table.put(name, new AttributeValue((double) 0.0D));
+	        } else if(type.equals("long")) {
+	            table.put(name, new AttributeValue((long) 0L));
+	        } else if(type.equals("String")) {
+	            table.put(name, new AttributeValue(""));
+	        }
+	    }
+
+	    void put(String key, AttributeValue value) {
+	     	int type = ((AttributeValue) table.get(key)).getType();
+	        //System.out.println(key + " " + type);
+	        AttributeValue v = null;
+	        if(type == AttributeValue.BOOL) {
+	            v = new AttributeValue(value.booleanValue());
+                } else if(type == AttributeValue.INT) {
+	            v = new AttributeValue(value.intValue());
+                } else if(type == AttributeValue.LONG) {
+	            v = new AttributeValue(value.longValue());
+                } else if(type == AttributeValue.STRING) {
+	            v = new AttributeValue(value.stringValue());
+                } else if(type == AttributeValue.DOUBLE) {
+	            v = new AttributeValue(value.doubleValue());
+                }    
+	        table.put(key, v);
+	    }
+	}
+
+PARSER_END(MyParser)
+
+
+/*----------------------------*/
+/* Skip Whitespace everywhere */
+/*----------------------------*/
+
+SKIP :
+{
+	" "
+|
+	"\t"
+|
+	"\n"
+|
+	"\r"
+}
+
+/* [39]    ExprWhitespace    ::=    S  */
+SPECIAL_TOKEN :
+{
+	<S: ( [" ", "\n", "\t", "\r"] )+>
+}
+
+/*-----------------*/
+/* Operator Tokens */
+/*-----------------*/
+
+
+TOKEN:
+{
+		<SLASH:		"/"	>
+	|	<SLASHSLASH:	"//"	>
+	| 	<UNION:		"|"	>
+	| 	<PLUS:		"+"	>
+	| 	<MINUS:		"-"	>
+	|	<ASSIGN:	"="	>
+	|	<MATCH:		"=~"	>
+	| 	<EQ:		"=="	>
+	| 	<NEQ:		"!="	>
+	| 	<LT:		"<"	>
+	| 	<LTE:		"<="	>
+	|	<GT:		">"	>
+	| 	<GTE:		">="	>
+	|	<VARIABLE:	"$"	>
+	| 	<TRUE:		"true"	>
+	|	<FALSE:		"false"	>
+	|	<INT:		"int"	>
+	|	<LONG:		"long"	>
+	|	<DOUBLE:	"double"	>
+	|	<STRING:	"String"	>
+	|	<BOOLEAN:	"boolean"	>
+	| 	<SEPARATOR:	";"	>
+}
+
+/*-----------------------------------------------*/
+/* Unambigious Tokens (Number, Literal, Variable */
+/*-----------------------------------------------*/
+
+TOKEN:
+{
+	  < INTEGER_LITERAL: <DECIMAL_LITERAL> (["l","L"])?  >
+|
+	  < #DECIMAL_LITERAL: (["0"-"9"])+ >
+|
+	  < FLOATING_POINT_LITERAL:
+        	(["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)? (["f","F","d","D"])?
+      	| 	"." (["0"-"9"])+ (<EXPONENT>)? (["f","F","d","D"])?
+      	| 	(["0"-"9"])+ <EXPONENT> (["f","F","d","D"])?
+      	| 	(["0"-"9"])+ (<EXPONENT>)? ["f","F","d","D"]
+  	  >
+|
+	  < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
+|
+	  < CHARACTER_LITERAL:
+	"'"
+	(   (~["'","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+        )
+      	"'"
+  	  >
+|
+	  < STRING_LITERAL:
+      	"\""
+      	(   (~["\"","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+        )*
+        "\""
+  	  >
+}
+
+TOKEN:
+{
+	< #Letter:
+      [
+       "\u0041"-"\u005a",
+       "\u005f",
+       "\u0061"-"\u007a",
+       "\u00c0"-"\u00d6",
+       "\u00d8"-"\u00f6",
+       "\u00f8"-"\u00ff",
+       "\u0100"-"\u1fff",
+       "\u3040"-"\u318f",
+       "\u3300"-"\u337f",
+       "\u3400"-"\u3d2d",
+       "\u4e00"-"\u9fff",
+       "\uf900"-"\ufaff"
+      ]
+  	>
+|
+	< #Digit:
+      [
+       "\u0030"-"\u0039",
+       "\u0660"-"\u0669",
+       "\u06f0"-"\u06f9",
+       "\u0966"-"\u096f",
+       "\u09e6"-"\u09ef",
+       "\u0a66"-"\u0a6f",
+       "\u0ae6"-"\u0aef",
+       "\u0b66"-"\u0b6f",
+       "\u0be7"-"\u0bef",
+       "\u0c66"-"\u0c6f",
+       "\u0ce6"-"\u0cef",
+       "\u0d66"-"\u0d6f",
+       "\u0e50"-"\u0e59",
+       "\u0ed0"-"\u0ed9",
+       "\u1040"-"\u1049"
+      ]
+	>
+|
+	<OR:	"||">
+|
+ 	<AND:	"&&">
+|
+	<MOD:	"mod">
+|
+	<DIV:	"div">
+|       
+	<NCName :
+		(<Letter>) (<Letter> | <Digit>)*
+	>
+}
+
+AttributeValue parseOneLine():
+{
+    AttributeValue value;
+}
+{
+	VarDeclaration() <SEPARATOR> 
+	{ 
+	  //System.out.println("variable declaration"); 
+	  return null; 
+	}
+| 	
+	value = Expr() <SEPARATOR> 
+	{ 
+	  //System.out.println("Expression is evaluated to: " + value); 
+	  return value; 
+	}
+|
+	<SEPARATOR> { return null; }
+/*
+|
+	<EOF> 
+	{ 
+	  return null; 
+	}
+*/
+}
+
+
+void VarDeclaration():
+{
+    String s;
+    Token t;
+}
+{
+	s = Type() t = <NCName>  
+        { 
+	  initialize(s, t.image); 
+	  //System.out.println("table content: " + table);
+	  //return null;	
+	}	
+}
+
+String Type():
+{
+}
+{
+	<BOOLEAN> { return new String("boolean"); }
+|
+	<INT> { return new String("int"); }
+|	
+	<DOUBLE> { return new String("double"); }
+|
+	<LONG> { return new String("long"); }
+|
+	<STRING> { return new String("String"); }
+}
+
+
+AttributeValue VariableReference() :
+{
+    Token t;
+}
+{
+	<VARIABLE> t = <NCName>
+	{ return getVariableValue(t.image); }
+}
+
+AttributeValue Expr():
+{
+    AttributeValue value;
+}
+{
+	LOOKAHEAD( <NCName> <ASSIGN> ) 
+	value = Assignment() { return value; }
+|	
+	value = ConditionalExpr() { return value; }
+}
+
+AttributeValue Assignment():
+{
+    AttributeValue value;
+    Token t;
+}
+{
+	t = <NCName> <ASSIGN> value = Expr()
+        { 
+	  //System.out.println("assignment is called");
+	  put(t.image, value);
+	  //System.out.println("table content: " + table);
+	  return new AttributeValue(true); 
+        }
+}
+
+AttributeValue ConditionalExpr(): 
+{
+    AttributeValue value;
+}
+{
+	value = OrExpr() { return value; }
+}
+
+AttributeValue PrimaryExpr() :
+{
+    AttributeValue value;
+}
+{
+	value = VariableReference() { return value; }
+	| "(" value = Expr() ")"  { return value; }
+	| value = Literal()  { return value; }
+}
+
+AttributeValue Literal():
+{
+    Token t;
+    AttributeValue value; 
+}
+{
+	t = <INTEGER_LITERAL> { return new AttributeValue(Integer.parseInt(t.image)); }
+|
+	t = <FLOATING_POINT_LITERAL> { return new AttributeValue(Double.parseDouble(t.image)); }
+|	
+	t = <STRING_LITERAL> 
+	{ 
+	  StringBuffer sb = new StringBuffer();
+	  String s = t.image;
+	  for(int i = 0; i < s.length(); i++) {
+            if(s.charAt(i) != '"') {
+	      sb.append(s.charAt(i));
+            }
+          }
+	  return new AttributeValue(sb.toString()); 
+ 	}
+|
+	value = BooleanLiteral() { return value; }
+}
+
+AttributeValue BooleanLiteral():
+{}
+{
+	<TRUE> { return new AttributeValue(true); }
+|
+	<FALSE> { return new AttributeValue(false); }
+}
+
+/*--------------*/
+/* 3.4 Booleans */
+/*--------------*/
+
+/* [21] OrExpr    ::=    AndExpr | OrExpr 'or' AndExpr */ 
+AttributeValue OrExpr() :
+{
+    AttributeValue d1;
+    AttributeValue d2;
+}
+{
+	d1 = AndExpr() 
+	( 
+	  <OR> d2 = AndExpr() 
+	  { 
+	    if(d1.booleanValue() || d2.booleanValue()) 
+	      d1 = new AttributeValue(true);
+	    else
+	      d1 = new AttributeValue(false);
+          }
+	)*
+        { return d1; }
+}
+
+/* [22] AndExpr    ::=    EqualityExpr  | AndExpr 'and' EqualityExpr  */
+AttributeValue AndExpr() :
+{
+    AttributeValue d1;
+    AttributeValue d2;
+}
+{
+	d1 = EqualityExpr() 
+	( 
+	  <AND> d2 = EqualityExpr() 
+	  {
+	    if(d1.booleanValue() && d2.booleanValue())
+	      d1 = new AttributeValue(true);
+	    else
+	      d1 = new AttributeValue(false);
+          }
+	)*
+	{ return d1; }
+}
+
+/* [23] EqualityExpr    ::=    RelationalExpr | EqualityExpr '=' RelationalExpr | EqualityExpr '!=' RelationalExpr */
+AttributeValue EqualityExpr() :
+{
+    AttributeValue d1;
+    AttributeValue d2;
+}
+{
+	d1 = RelationalExpr() 
+	( 
+	  <EQ> d2 = RelationalExpr() 
+	  { 
+	    //System.out.println(d1 + "; " + d2);
+	    /* if(d1.getType() != d2.getType()) 
+		return new AttributeValue(false); */
+	    if(d1.isEqualTo(d2))
+		d1 = new AttributeValue(true);
+	    else 
+		d1 = new AttributeValue(false); 
+	    //System.out.println(d1);
+	  }
+	|
+	  <NEQ> d2 = RelationalExpr()  
+	  { 
+	    if(!d1.isEqualTo(d2))
+		d1 = new AttributeValue(true);
+	    else 
+		d1 = new AttributeValue(false); 
+	  }
+	|	
+	  <MATCH> d2 = RelationalExpr()
+	  {
+	      //System.out.println("d1: " + d1.stringValue());
+	      //System.out.println("d2: " + d2.stringValue());
+	    try {
+	      RE re = new RE(d2.stringValue());
+	      if(re.match(d1.stringValue())) 
+	          d1 = new AttributeValue(true);
+	      else
+	          d1 = new AttributeValue(false);
+            } catch(Exception e) {
+	      e.printStackTrace(); 
+	    }
+	  }
+	)*
+	{ return d1; }
+}
+
+
+/* [24] RelationalExpr    ::=    AdditiveExpr | RelationalExpr '<' AdditiveExpr | RelationalExpr '>' AdditiveExpr  
+					   | RelationalExpr '<=' AdditiveExpr  | RelationalExpr '>=' AdditiveExpr */
+AttributeValue RelationalExpr() :
+{
+    AttributeValue d1;
+    AttributeValue d2;
+}
+{
+	d1 = AdditiveExpr()  
+	( 
+	  <LT> d2 = AdditiveExpr() 
+	  { 
+	    if(d1.doubleValue() < d2.doubleValue()) 
+	      d1 = new AttributeValue(true); 
+	    else 
+	      d1 = new AttributeValue(false); 
+          }
+	| <GT> d2 = AdditiveExpr()
+	  { 
+	    if(d1.doubleValue() > d2.doubleValue()) 
+	      d1 = new AttributeValue(true); 
+	    else 
+	      d1 = new AttributeValue(false); 
+          }
+	| <LTE>	d2 = AdditiveExpr()
+	  { 
+	    if(d1.doubleValue() <= d2.doubleValue()) 
+	      d1 = new AttributeValue(true); 
+	    else 
+	      d1 = new AttributeValue(false); 
+          }
+	| <GTE> d2 = AdditiveExpr()	
+	  { 
+	    if(d1.doubleValue() >= d2.doubleValue()) 
+	      d1 = new AttributeValue(true); 
+	    else 
+	      d1 = new AttributeValue(false); 
+          }
+	)*
+	{ return d1; }
+}
+
+/*-------------*/
+/* 3.5 Numbers */
+/*-------------*/
+
+/* [25] AdditiveExpr ::= MultiplicativeExpr  | AdditiveExpr '+' MultiplicativeExpr  | AdditiveExpr '-' MultiplicativeExpr  */
+AttributeValue AdditiveExpr() :
+{
+    AttributeValue d1;
+    AttributeValue d2;
+}
+{
+	d1 = MultiplicativeExpr() 
+	( 
+	  <PLUS> d2 = MultiplicativeExpr()
+	  { d1 = new AttributeValue(d1.doubleValue()+d2.doubleValue()); }
+	| <MINUS> d2 = MultiplicativeExpr() 
+	  { d1 = new AttributeValue(d1.doubleValue()-d2.doubleValue()); }
+	)*
+	{ return d1; }
+}
+
+/* [26] MultiplicativeExpr ::= UnaryExpr | MultiplicativeExpr MultiplyOperator UnaryExpr
+			| MultiplicativeExpr 'div' UnaryExpr | MultiplicativeExpr 'mod' UnaryExpr  */
+AttributeValue MultiplicativeExpr() :
+{
+    AttributeValue d1;
+    AttributeValue d2;
+}
+{
+	d1 = UnaryExpr() 
+	( 
+	  "*" d2 = UnaryExpr() { d1 = new AttributeValue(d1.doubleValue()*d2.doubleValue()); }
+	| <DIV> d2 = UnaryExpr() { d1 = new AttributeValue(d1.doubleValue()/d2.doubleValue()); }
+	| <MOD> d2 = UnaryExpr() { d1 = new AttributeValue(d1.doubleValue()%d2.doubleValue()); } 
+	)*
+	{ return d1; } 
+}
+
+/* [27]    UnaryExpr    ::=    UnionExpr  | '-' UnaryExpr  */
+AttributeValue UnaryExpr() :
+{
+    AttributeValue d;
+}
+{
+	d = PrimaryExpr() { return d; }
+	| <MINUS> d = UnaryExpr() 
+	{ 
+	    return new AttributeValue((-1) * d.doubleValue());
+        }
+}
+
+
+
+

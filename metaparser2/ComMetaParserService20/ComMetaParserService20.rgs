@@ -1,0 +1,11 @@
+HKCR
+{
+	NoRemove AppID
+	{
+		{32870210-E255-4920-83B4-0B304EFA68BC} = s 'ComMetaParserService20'
+		'ComMetaParserService20.EXE'
+		{
+			val AppID = s {32870210-E255-4920-83B4-0B304EFA68BC}
+		}
+	}
+}

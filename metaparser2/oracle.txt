@@ -1,0 +1,2 @@
+http://www.book.org	D:\\Inetpub\\wwwroot\\bookRule.xml
+http://www.employee.org	D:\\Inetpub\\wwwroot\\employeeRule.xml

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config>
+	<param name="resolveExternals" type="bool" value="true"/>
+	<param name="validate" type="bool" value="true"/>
+	<param name="baseURI" type="string" value="http://160.39.129.224:8080/servlet/Oracle?xmlns="/>
+</config>

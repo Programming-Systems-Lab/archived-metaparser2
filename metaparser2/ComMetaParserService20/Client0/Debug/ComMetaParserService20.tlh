@@ -1,0 +1,72 @@
+// Created by Microsoft (R) C/C++ Compiler Version 12.00.8964.0 (4cfa3516).
+//
+// q:\project\visual studio\commetaparserservice20\client0\debug\ComMetaParserService20.tlh
+//
+// C++ source equivalent of Win32 type library Q:\Project\Visual Studio\ComMetaParserService20\Debug\ComMetaParserService20.exe
+// compiler-generated file created 05/10/02 at 13:45:44 - DO NOT EDIT!
+
+#pragma once
+#pragma pack(push, 8)
+
+#include <comdef.h>
+
+namespace COMMETAPARSERSERVICE20Lib {
+
+//
+// Forward references and typedefs
+//
+
+struct /* coclass */ MetaParser;
+struct __declspec(uuid("4540c43f-fe45-4658-99d5-af0932f27e91"))
+/* dual interface */ IMetaParser;
+
+//
+// Smart pointer typedef declarations
+//
+
+_COM_SMARTPTR_TYPEDEF(IMetaParser, __uuidof(IMetaParser));
+
+//
+// Type library items
+//
+
+struct __declspec(uuid("27d06537-2839-405d-ab3c-62504d245959"))
+MetaParser;
+    // [ default ] interface IMetaParser
+
+struct __declspec(uuid("4540c43f-fe45-4658-99d5-af0932f27e91"))
+IMetaParser : IDispatch
+{
+    //
+    // Wrapper methods for error-handling
+    //
+
+    HRESULT Init ( );
+    VARIANT_BOOL Parse (
+        const _variant_t & xmlSource );
+    VARIANT_BOOL Process ( );
+    _bstr_t Output ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+    virtual HRESULT __stdcall raw_Init ( ) = 0;
+    virtual HRESULT __stdcall raw_Parse (
+        VARIANT xmlSource,
+        VARIANT_BOOL * isSuccessful ) = 0;
+    virtual HRESULT __stdcall raw_Process (
+        VARIANT_BOOL * isSuccessful ) = 0;
+    virtual HRESULT __stdcall raw_Output (
+        BSTR * xmlOutput ) = 0;
+};
+
+//
+// Wrapper method implementations
+//
+
+#include "q:\project\visual studio\commetaparserservice20\client0\debug\ComMetaParserService20.tli"
+
+} // namespace COMMETAPARSERSERVICE20Lib
+
+#pragma pack(pop)

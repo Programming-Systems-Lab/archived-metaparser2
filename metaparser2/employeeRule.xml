@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+ <ruleset namespace="xmlns:em='http://www.employee.org'">
+  <rule>
+    <condition>
+      <variable name="a" type="string" path="//em:Name[1]"/>
+      <operator type="string" value="MATCH"/>
+      <variable name="b" type="string" value="John.*"/>
+    </condition>
+    <action name="first name" type="string" value="john"/>
+  </rule>
+</ruleset>
